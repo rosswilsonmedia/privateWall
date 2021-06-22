@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Logged In</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-+0n0xVW2eSR5OomGNYDnhzAbDsOXxcvSN1TPprVMTNDbiYZCxYbOOl7+AMvyTG2x" crossorigin="anonymous">
+</head>
+<body>
+    <div class="container p-4 bg-light">
+        <div class='mb-4 d-flex align-items-center justify-content-between'>
+            <h1>Hey there {{user.first_name}} {{user.last_name}}!</h1>
+            <a class='btn btn-dark' href='/logout'>Logout</a>
+        </div>
+        <div class="row d-flex justify-content-between">
+            <div class="col-7">
+                <h2 class='mb-4'>Your Dashboard ({{user.messages|count}} unread messages)</h2>
+                {% for msg in user.messages: %}
+                    <div class='p-3'>
+                        <p>{{msg.sender_name}} said: ({{(now - msg.created_at).days }} days ago)</p>
+                        <p>{{msg.message}}</p>
+                        <a class='btn btn-dark mt-3' href='/message/delete{{msg.id}}'>Delete Message</a>
+                    </div>
+                {% endfor %}
+            </div>
+            <div class="col-4">
+                <h2 class='mb-4'>Send a Message</h2>
+                <form action='/message/send' method="POST">
+                    <label class='form-label' for='recipient_id'>Send To:</label>
+                    <select class='form-select' id='recipient_id' name='recipient_id'>
+                        {% for user in all_users_except: %}
+                            <option value="{{user.id}}">{{user.first_name}} {{user.last_name}}</option>
+                        {% endfor %}
+                    </select>
+                    <label class='form-label' for='message'>Message:</label>
+                    <input class='form-control' type='text' id='message' name='message'>
+                    <input class="btn btn-dark mt-3" type="submit" value="Send Message">
+                </form>
+                <div class="mt-4">
+                    {% with messages = get_flashed_messages(category_filter=["login_errors"]) %}
+                        {% if messages %}
+                            {% for msg in messages: %}
+                                <p class='text-danger'>{{msg}}</p>
+                            {% endfor %}
+                        {% endif %}
+                    {% endwith %}
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
